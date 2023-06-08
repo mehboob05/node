@@ -1,19 +1,15 @@
-// const {sum,mul} =require("./functions")
+const express = require('express')
+// initilize express module
+const app = express()
+const port = 3004
 
+app.get('/', (req, res) => {
+  res.send('<h2>This is  my home page</h2>')
+})
+app.get('/about', (req, res) => {
+  res.send('<h1>This is about page heading 1</h1>')
+})
 
-
-// sum(5,6);
-// mul(5,7);
-
-// os moudles 
-
-const os =require("os");
-// console.log(os);
-
-// console.log(os.type);
-
-// console.log(os.cpus());
-
-// console.log(os.cpus().length);
-
-
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
+})
