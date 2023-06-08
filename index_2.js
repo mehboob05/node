@@ -1,8 +1,19 @@
 //Create server and send request and recevied response
 
+const { json } = require("body-parser");
 const http = require("http");
 
 const server = http.createServer((request,response)=>{
+    //content type
+    response.setHeader("content-type","application/json");
+    //json date send as object and received in string
+    const obj ={
+        name:"mehboob",
+        class:"MCS",
+        City:"Lodhran"
+    }
+    const objstr =json.stringify(obj);
+    
     if(request.url == "/contact"){
         response.write("This is Contact Page")
     } else if(request.url == "/product"){
@@ -15,7 +26,7 @@ const server = http.createServer((request,response)=>{
         response.write("404 the page is not found")
     }
    // status
-    response.writeHead
+    // response.writeHead(404,"this page is not found")
     response.end();
 });
 
