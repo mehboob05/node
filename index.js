@@ -4,8 +4,15 @@ const app = express()
 const port = 3004;
 
 app.get('/', (req, res) => {
+    const student = {
+        name: "Mehboob",
+        Class: "MCS",
+        City: "Lodhran",
+        Gender: "Male"
+    }
+    res.json(student)
    
-    res.send("This is home page");
+   
   })
 
 
