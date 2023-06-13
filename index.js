@@ -3,6 +3,11 @@ const express = require('express')
 const app = express()
 const port = 3004;
 
+// middleware used ==> What Is Middleware? A request handler with access to the application's request-response cycle is known as middleware.
+// It's a function that holds the request object, the response object, and the middleware function. 
+// Middleware can also send the response to the server before the request.
+app.use(express.json());
+
 app.get('/', (req, res) => {
     const student = {
         name: "Mehboob",
@@ -40,6 +45,32 @@ status:"ok",
   });
 })
 
+// how to get request body data in express js? data send  to server through request body 
+let student = [];
+app.post("/create-user",(req,res)=>{
+  console.log(req.body);
+  // push data in array through request body  
+  student.push(req.body);
+
+  res.json(
+    
+    student
+  );
+ 
+  //delete data from server
+  app.delete("/delete-user/:id",(req,res)=>{
+    // console.log(req.params.id);
+    const id = req.params.id;
+    student.splice(id,1);
+    res.json({
+      status:"ok",
+      student:student
+    }
+       
+    )
+  })
+ 
+})
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
   })
