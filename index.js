@@ -1,76 +1,89 @@
-const express = require('express')
-// initilize express module
-const app = express()
-const port = 3004;
+const express =require("express");
+const app = express();
+const port =3004;
 
-// middleware used ==> What Is Middleware? A request handler with access to the application's request-response cycle is known as middleware.
-// It's a function that holds the request object, the response object, and the middleware function. 
-// Middleware can also send the response to the server before the request.
+//middleware used
 app.use(express.json());
 
-app.get('/', (req, res) => {
-    const student = {
-        name: "Mehboob",
-        Class: "MCS",
-        City: "Lodhran",
-        Gender: "Male"
-    }
-    res.json(student); 
-
-  })
- 
-   //http://localhost:3004/search-fruit?id=2   data send using query
-
-   app.get("/search-fruits",(req,res)=>{
-    console.log(req.query.id);
-
-    const fruits =["apple","mango","orange","cherry","banana"];
-    const results = fruits[req.query.id]; 
+// data send  to server using request body    use post and json in insomnia
+// add data url  http://localhost:3004/create-blog
+let blogpost =[];
+app.post("/create-blog",(req,res)=>{
+    console.log(req.body);
+    // push data through request body
+    blogpost.push(req.body);
 
     res.json({
-      status:"ok",
-      results:results
-    });
+        status:"true",
+        blogpost:blogpost
+    })
+})
+
+//delete data from server   use delete and body in insomnia
+// url data delete  http://localhost:3004/delete-blog/1
+app.delete("/delete-blog/:bid",(req,res)=>{
+    const bid = req.params.bid;
+    blogpost.splice(bid,1);
+    res.json({
+        status:"true",
+        blogpost:blogpost
+    })
+})
+
+// update data server     use put and json in insomnia
+//http://localhost:3004/update-blog/1
+app.put("/update-blog/:bid",(req,res)=>{
+    const bid = req.params.bid;
+
+    let targetBlog = blogpost[bid];
+
+    if(targetBlog){
+        blogpost[bid] =req.body;
+        res.json({
+            status:"true",
+            blogpost:blogpost
+
+        })
+    } else {
+        res.json({
+            status:"false",
+            massage:"Blog not Found"
+        })
+    }
+})
+
+//read data server   http://localhost:3004/read-blog/1   use get method and in body text in insomnia
+
+app.get("/read-blog/:bid",(req,res)=>{
+    const index = req.params.bid;
+  
+   res.json({
+    status:"true",
+    blogpost:blogpost[index]
    })
+   
+   
 
-//http://localhost:3004/search/2    data send to sever using params
-app.get("/search/:id",(req,res)=>{
-  console.log(req.params.id);
-  const name=["mehboob","ali","raza","asif"];
-  const result = name[req.params.id];
+})
+
+// search data from server  
+
+app.get("/search-blog/:bid",(req,res)=>{
+  const bid = req.params.bid;
+  blogpost.find(bid);
   res.json({
-status:"ok",
- result:result
-
-  });
+    status:"true",
+    blogpost:blogpost
+  })
 })
 
-// how to get request body data in express js? data send  to server through request body 
-let student = [];
-app.post("/create-user",(req,res)=>{
-  console.log(req.body);
-  // push data in array through request body  
-  student.push(req.body);
 
-  res.json(
-    
-    student
-  );
- 
-  //delete data from server
-  app.delete("/delete-user/:id",(req,res)=>{
-    // console.log(req.params.id);
-    const id = req.params.id;
-    student.splice(id,1);
-    res.json({
-      status:"ok",
-      student:student
-    }
-       
-    )
-  })
- 
-})
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-  })
+
+
+
+
+
+
+app.listen(port,()=>{
+    console.log(`app listening on port ${port}`);
+})  
