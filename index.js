@@ -5,9 +5,10 @@ const mongoose = require('mongoose');
 const StudentModel = require("./models/StudentModel")
 const multer = require('multer');
 const upload = multer({dest:'uploads/'});
+const cors = require("cors")
 //middleware used
 app.use(express.json());
-
+app.use(cors());
 
 
 // file upload
@@ -30,9 +31,6 @@ app.post("/upload-image",upload.single('image'),async(req,res)=>{
       status:"Not Allowed",
     })
   }
- res.json({
-  status:"ok"
- })
 })
 
 
@@ -41,11 +39,19 @@ app.post("/upload-image",upload.single('image'),async(req,res)=>{
 
 // find/search all records
 app.get("/students",async(req,res)=>{
+ try{
   const students = await StudentModel.find();
-  res.json({
+  return res.json({
     status:true,
     students:students
   })
+ } catch{
+  return res.json({
+    status:false,
+    msg:"Something went wrong"
+  })
+ }
+ 
   
 })
 // read record by id
