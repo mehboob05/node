@@ -2,22 +2,27 @@ const mongoose =require("mongoose");
 const {Schema} = mongoose;
 
 const StudentSchema = new Schema({
-    Name:{
+    name:{
         type:String,
         required:[true,"Please Provide Student Name"]
     },
-    City:{
+    image:{
         type:String,
-        required:[true,"Please Provide Student City Name"],
-        enum:{
-            values:['Lodhran','Bahawalpur'],
-            message:'{VALUE} is not supported'
-        }
+        required:[true,"Please Provide Student Image"],
+        },
+    email:{
+        type:String,
+        required:[true,"Please Provide Student Email"],
+        },
+   
+    address:{
+        type:String,
+        required:[true,"Please Provide Student Address"]
     },
-    Education:{
+    about:{
         type:String,
-        required:[true,"Please Provide Student Education"]
-    }
+        required:[true,"Please Provide Student About"]
+    },
 });
 
 const StudentModel = mongoose.model('Student',StudentSchema);

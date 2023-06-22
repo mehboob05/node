@@ -9,29 +9,28 @@ const cors = require("cors")
 //middleware used
 app.use(express.json());
 app.use(cors());
-
-
+app.use(express.static('uploads'))
 // file upload
-app.post("/upload-image",upload.single('image'),async(req,res)=>{
+// app.post("/upload-image",upload.single('image'),async(req,res)=>{
 
-  let ext = req.file.mimetype.split("/")[1];
-  console.log(ext);
+//   let ext = req.file.mimetype.split("/")[1];
+//   console.log(ext);
 
-  if(ext == "jpeg"|| ext == "gif"|| ext == "jpg"|| ext == "png" || ext == "plain"){
-    if(ext == "plain"){
-      ext = "txt";
-    }
-    fs.rename(req.file.path, req.file.path + "."+ ext,()=>{console.log("done")})
-    return res.json({
-      status: "OK"
-    })
-  } else {
-    fs.unlink(req.file.path,()=>{console.log("deleted")})
-    return res.json({
-      status:"Not Allowed",
-    })
-  }
-})
+//   if(ext == "jpeg"|| ext == "gif"|| ext == "jpg"|| ext == "png" || ext == "plain"){
+//     if(ext == "plain"){
+//       ext = "txt";
+//     }
+//     fs.rename(req.file.path, req.file.path + "."+ ext,()=>{console.log("done")})
+//     return res.json({
+//       status: "OK"
+//     })
+//   } else {
+//     fs.unlink(req.file.path,()=>{console.log("deleted")})
+//     return res.json({
+//       status:"Not Allowed",
+//     })
+//   }
+// })
 
 
 
@@ -55,39 +54,60 @@ app.get("/students",async(req,res)=>{
   
 })
 // read record by id
-app.get("/read-student/:id",async(req,res)=>{
+app.get("/student/:id",async(req,res)=>{
   const readstudent = req.params.id;
-  const readstd = await StudentModel.findById(readstudent);
-  res.json({
-    status:true,
-    msg:"Record Read Successfully",
-    students:readstd
-  })
+  console.log(readstudent)
+  try{
+  
+    const readstd = await StudentModel.findById(readstudent);
+    return res.json({
+      status:true,
+      msg:"Record Read Successfully",
+      students:readstd
+    })
+  }
+  catch {
+    return res.json({
+      status:false,
+      msg:"Something went wrong"
+    })
+  }
+ 
 })
 // create record using post method
-app.post("/create-student",async(req,res)=>{
-  const newStudent = req.body;
-  try{
-    await StudentModel.create(newStudent);
-   return res.json({
-      status:true,
-      msg:"Record Created Sucessfully.",
-     
-    })
-  } catch(error){
+app.post("/create-student", upload.single('image'), async (request, response) => {
+
+
+  if (request.file.mimetype == "image/png" || request.file.mimetype == "image/jpg" || request.file.mimetype == "image/jpeg") {
+    let ext = request.file.mimetype.split("/")[1];
+    if (ext == "plain") { ext = "txt"; }
+    const NewImgName = request.file.path + "." + ext;
+    request.body.image = NewImgName;
+    fs.rename(request.file.path, NewImgName, () => { console.log("done") });
+
+  } else {
+    fs.unlink(request.file.path, () => { console.log("deleted") });
+  }
+
+  try {
+    await StudentModel.create(request.body);
+    return response.json({
+      "status": "OK"
+    });
+  } catch (error) {
     if (error.name === "ValidationError") {
       let errors = {};
+
       Object.keys(error.errors).forEach((key) => {
         errors[key] = error.errors[key].message;
       });
 
-      return res.json({
+      return response.json({
         "status": false,
         errors: errors
       })
     }
   }
- 
 })
 
 
