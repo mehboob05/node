@@ -5,11 +5,12 @@ const mongoose = require('mongoose');
 const StudentModel = require("./models/StudentModel")
 const multer = require('multer');
 const upload = multer({dest:'uploads/'});
-const cors = require("cors")
+const cors = require("cors");
+const path =require('path');
 //middleware used
 app.use(express.json());
 app.use(cors());
-app.use(express.static('uploads'))
+app.use("/uploads", express.static(path.join(path.resolve(),"uploads")));
 // file upload
 // app.post("/upload-image",upload.single('image'),async(req,res)=>{
 
@@ -78,9 +79,10 @@ app.get("/student/:id",async(req,res)=>{
 app.post("/create-student", upload.single('image'), async (request, response) => {
 
 
-  if (request.file.mimetype == "image/png" || request.file.mimetype == "image/jpg" || request.file.mimetype == "image/jpeg") {
+
+
+  if (request.file.mimetype == "image/png" || request.file.mimetype == "image/jpg" || request.file.mimetype == "image/jpeg" || request.file.mimetype == "image/gif") {
     let ext = request.file.mimetype.split("/")[1];
-    if (ext == "plain") { ext = "txt"; }
     const NewImgName = request.file.path + "." + ext;
     request.body.image = NewImgName;
     fs.rename(request.file.path, NewImgName, () => { console.log("done") });
@@ -92,7 +94,7 @@ app.post("/create-student", upload.single('image'), async (request, response) =>
   try {
     await StudentModel.create(request.body);
     return response.json({
-      "status": "OK"
+      "status": true
     });
   } catch (error) {
     if (error.name === "ValidationError") {
@@ -114,11 +116,18 @@ app.post("/create-student", upload.single('image'), async (request, response) =>
 //delete record from database
 app.delete("/delete-student/:id",async(req,res)=>{
   const delid = req.params.id;
-  await StudentModel.findByIdAndDelete(delid); 
-  res.json({
-    status:true,
-    msg:"Record delete Sucessfully."
-  })
+  try{
+    await StudentModel.findByIdAndDelete(delid); 
+    return res.json({
+      status:true,
+      msg:"Record delete Sucessfully."
+    })
+  } catch{
+     return res.json({
+      status:false,
+      msg:"not deleted."
+  }
+  
 })
 
 //update record 

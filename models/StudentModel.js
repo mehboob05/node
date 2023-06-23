@@ -9,6 +9,7 @@ const StudentSchema = new Schema({
     image:{
         type:String,
         required:[true,"Please Provide Student Image"],
+        get: linkUrl
         },
     email:{
         type:String,
@@ -23,7 +24,10 @@ const StudentSchema = new Schema({
         type:String,
         required:[true,"Please Provide Student About"]
     },
-});
+},{toJSON :{getters:true}});
 
+function linkUrl (image){
+    return "http://localhost:3004/" +image;
+}
 const StudentModel = mongoose.model('Student',StudentSchema);
 module.exports = StudentModel
