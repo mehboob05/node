@@ -94,7 +94,7 @@ app.post("/create-student", upload.single('image'), async (request, response) =>
   try {
     await StudentModel.create(request.body);
     return response.json({
-      "status": true
+      status: true
     });
   } catch (error) {
     if (error.name === "ValidationError") {
@@ -105,7 +105,7 @@ app.post("/create-student", upload.single('image'), async (request, response) =>
       });
 
       return response.json({
-        "status": false,
+        status: false,
         errors: errors
       })
     }
@@ -126,19 +126,42 @@ app.delete("/delete-student/:id",async(req,res)=>{
      return res.json({
       status:false,
       msg:"not deleted."
-  }
-  
-})
+  })
+
+}})
 
 //update record 
-app.put("/update-student/:id",async(req,res)=>{
-  const updateid = req.params.id;
-  const upstd = req.body;
-  await StudentModel.findByIdAndUpdate(updateid,upstd);
-  res.json({
-    status:true,
-    msg:"Record update Sucessfully."
-  })
+app.put("/update-student/:id", upload.single('image'), async (request, response) => {
+ const id = request.params.id;
+  if (request.file.mimetype == "image/png" || request.file.mimetype == "image/jpg" || request.file.mimetype == "image/jpeg" || request.file.mimetype == "image/gif") {
+    let ext = request.file.mimetype.split("/")[1];
+    const NewImgName = request.file.path + "." + ext;
+    request.body.image = NewImgName;
+    fs.rename(request.file.path, NewImgName, () => { console.log("done") });
+
+  } else {
+    fs.unlink(request.file.path, () => { console.log("deleted") });
+  }
+
+  try {
+    await StudentModel.findByIdAndUpdate(id,request.body);
+    return response.json({
+      status: true
+    });
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      let errors = {};
+
+      Object.keys(error.errors).forEach((key) => {
+        errors[key] = error.errors[key].message;
+      });
+
+      return response.json({
+        status: false,
+        errors: errors
+      })
+    }
+  }
 })
 mongoose.connect('mongodb://127.0.0.1:27017/studentDbM').then(()=>{
     app.listen(3004,()=>{
