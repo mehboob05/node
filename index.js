@@ -78,8 +78,15 @@ app.get("/student/:id",async(req,res)=>{
 // create record using post method
 app.post("/create-student", upload.single('image'), async (request, response) => {
 
-
-
+  // image validation 
+  if(!request.file){
+    return response.json({
+      status: false,
+      errors:{
+        image:"Please Provide image"
+      }
+    })
+  }
 
   if (request.file.mimetype == "image/png" || request.file.mimetype == "image/jpg" || request.file.mimetype == "image/jpeg" || request.file.mimetype == "image/gif") {
     let ext = request.file.mimetype.split("/")[1];
@@ -132,6 +139,14 @@ app.delete("/delete-student/:id",async(req,res)=>{
 
 //update record 
 app.put("/update-student/:id", upload.single('image'), async (request, response) => {
+  if(!request.file){
+    return response.json({
+      status: false,
+      errors:{
+        image:"Please Provide image"
+      }
+    })
+  }
  const id = request.params.id;
   if (request.file.mimetype == "image/png" || request.file.mimetype == "image/jpg" || request.file.mimetype == "image/jpeg" || request.file.mimetype == "image/gif") {
     let ext = request.file.mimetype.split("/")[1];
@@ -144,7 +159,7 @@ app.put("/update-student/:id", upload.single('image'), async (request, response)
   }
 
   try {
-    await StudentModel.findByIdAndUpdate(id,request.body);
+    await StudentModel.findByIdAndUpdate(id,request.body , {runValidators:true});
     return response.json({
       status: true
     });
