@@ -9,7 +9,10 @@ const cors = require("cors");
 const path =require('path');
 //middleware used
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+   origin: "*",
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}));
 app.use("/uploads", express.static(path.join(path.resolve(),"uploads")));
 // file upload
 // app.post("/upload-image",upload.single('image'),async(req,res)=>{
@@ -178,6 +181,27 @@ app.put("/update-student/:id", upload.single('image'), async (request, response)
     }
   }
 })
+
+// Search Recrd
+app.get("/search/:query", async (request, response) => {
+  const q = request.params.query;
+
+  try {
+    let result = await StudentModel.find({ name: { $regex: `${q}`, '$options': 'i' } }).select({ name: 1, _id: 1 })
+
+    return response.json({
+      status: true,
+      students: result
+    })
+  } catch (error) {
+    return response.json({
+      status: false,
+    })
+  }
+
+
+})
+
 mongoose.connect('mongodb://127.0.0.1:27017/studentDbM').then(()=>{
     app.listen(3004,()=>{
         console.log("Database and server Running");
